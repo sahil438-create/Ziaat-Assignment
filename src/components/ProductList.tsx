@@ -4,8 +4,10 @@ import { Heart } from 'lucide-react';
 
 const ProductList = () => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [favorites, setFavorites] = useState<Product[]>([]);
-
+  const [favorites, setFavorites] = useState<Product[]>(() => {
+    const saved = localStorage.getItem('favorites');
+    return saved ? JSON.parse(saved) : [];
+  });
   useEffect(() => {
     let saved: any = localStorage.getItem('favorites');
     saved = JSON.parse(saved);
@@ -16,9 +18,11 @@ const ProductList = () => {
         setProducts(data);
       });
   }, []);
+
   useEffect(() => {
     localStorage.setItem('favorites', JSON.stringify(favorites));
   }, [favorites]);
+
   const toggleFavorite = (product: Product) => {
     setFavorites((prev: any) => {
       const exists = prev.some((f: Product) => f.id === product.id);
@@ -28,6 +32,7 @@ const ProductList = () => {
       return [...prev, product];
     });
   };
+
   return (
     <div>
       <div className='products-grid'>
