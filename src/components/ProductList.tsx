@@ -4,10 +4,14 @@ import { Heart } from 'lucide-react';
 
 const ProductList = () => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
   const [favorites, setFavorites] = useState<Product[]>(() => {
     const saved = localStorage.getItem('favorites');
     return saved ? JSON.parse(saved) : [];
   });
+
   useEffect(() => {
     let saved: any = localStorage.getItem('favorites');
     saved = JSON.parse(saved);
@@ -18,6 +22,24 @@ const ProductList = () => {
         setProducts(data);
       });
   }, []);
+
+  useEffect(() => {
+    let result = products;
+
+    if (searchTerm) {
+      result = result.filter((product) =>
+        product.title.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    if (selectedCategory) {
+      result = result.filter(
+        (product) => product.category === selectedCategory
+      );
+    }
+
+    setFilteredProducts(result);
+  }, [searchTerm, selectedCategory, products]);
 
   useEffect(() => {
     localStorage.setItem('favorites', JSON.stringify(favorites));
@@ -33,11 +55,36 @@ const ProductList = () => {
     });
   };
 
+  const categories = [...new Set(products.map((product) => product.category))];
+
   return (
     <div>
+      <div className='search-bar'>
+        <input
+          type='text'
+          placeholder='Search products...'
+          className='search-input'
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+      <div className='category-filter'>
+        <select
+          className='filter-select'
+          value={selectedCategory}
+          onChange={(e) => setSelectedCategory(e.target.value)}
+        >
+          <option value=''>All Categories</option>
+          {categories.map((category) => (
+            <option key={category} value={category}>
+              {category.charAt(0).toUpperCase() + category.slice(1)}
+            </option>
+          ))}
+        </select>
+      </div>
       <div className='products-grid'>
-        {products &&
-          products.map((product: Product) => (
+        {filteredProducts &&
+          filteredProducts.map((product: Product) => (
             <div key={product.id} className='product-card'>
               <img
                 src={product.image}
