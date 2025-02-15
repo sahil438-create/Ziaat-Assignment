@@ -11,13 +11,24 @@ const ProductList = () => {
   }, []);
   return (
     <div>
-      {products &&
-        products.map((product: any) => (
-          <div key={product.id}>
-            <img height='100px' width='100px' src={product.image} alt='' />
-            <div>{product.title}</div>
-          </div>
-        ))}
+      <div className='products-grid'>
+        {products &&
+          products.map((product: any) => (
+            <div key={product.id} className='product-card'>
+              <img
+                src={product.image}
+                alt={product.title}
+                className='product-image'
+              />
+              <div className='product-info'>
+                <h3 className='product-title'>{product.title}</h3>
+                <p className='product-category'>{product.category}</p>
+                <p className='product-price'>${product.price.toFixed(2)}</p>
+                <button className='favorite-button'>fav</button>
+              </div>
+            </div>
+          ))}
+      </div>
     </div>
   );
 };
